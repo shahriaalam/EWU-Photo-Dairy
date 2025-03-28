@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         { src: "images/2nd Semester/S2_6.jpeg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_7.jpeg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_8.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_52.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_9.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_10.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_11.jpg", semester: 2, text: "Group study session." },
@@ -76,7 +77,63 @@ document.addEventListener("DOMContentLoaded", function () {
         { src: "images/2nd Semester/S2_34.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_35.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_36.jpeg", semester: 2, text: "Group study session." },
-        ]
+        { src: "images/2nd Semester/S2_37.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_38.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_39.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_40.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_41.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_42.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_43.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_44.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_45.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_46.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_47.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_48.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_49.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_50.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_51.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_53.jpg", semester: 2, text: "Group study session." },
+        ],
+        3: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        4: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        5: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        6: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        7: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        8: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        9: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        10: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        11: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        12: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
         // Add up to 12 semesters
     };
 
