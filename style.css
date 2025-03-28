@@ -47,6 +47,7 @@ body {
     padding: 20px;
 }
 
+/* Semester Buttons */
 .semester-filter button {
     margin: 5px;
     padding: 10px 15px;
@@ -54,18 +55,41 @@ body {
     background: #333;
     color: white;
     cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.3s;
 }
 
+.semester-filter button:hover {
+    background: #ff9800;
+}
+
+/* Semester Sections */
+.semester-section {
+    margin-top: 40px;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.semester-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Photo Grid */
 .photo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 10px;
     padding: 20px;
 }
 
 .photo-grid img {
-    width: 100%;
-    height: auto;
+    width: 190px;
+    height: 190px;
+    object-fit: cover;
     cursor: pointer;
     border-radius: 5px;
     transition: transform 0.3s;
@@ -90,8 +114,8 @@ body {
 }
 
 #lightbox img {
-    max-width: 80%;
-    max-height: 80%;
+    max-width: 90%;
+    max-height: 90%;
 }
 
 #lightbox-text {

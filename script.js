@@ -11,16 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Semester Filtering
-    window.filterSemester = function (semester) {
-        const photos = document.querySelectorAll(".photo-item");
-        photos.forEach(photo => {
-            if (semester === "all" || photo.dataset.semester == semester) {
-                photo.style.display = "block";
-            } else {
-                photo.style.display = "none";
-            }
-        });
+    // Scroll to Semester Section
+    window.scrollToSemester = function (semesterId) {
+        const section = document.getElementById(semesterId);
+        if (section) {
+            section.scrollIntoView({ behavior: "smooth" });
+        }
     };
 
     // Lightbox Functionality
@@ -34,9 +30,16 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("lightbox").classList.add("hidden");
     };
 
-    // Dynamically Load Photos
+    // Dynamically Load Photos into Semester Sections
     const photoGallery = document.getElementById("photo-gallery");
-    const photos = [
+
+    const semesters = {
+        1: [
+            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
+            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
+        ],
+        2: [
+        { src: "images/2nd Semester/S2_1.1.png", semester: 2, text: "Our First Presentation" },
         { src: "images/2nd Semester/S2_1.jpg", semester: 2, text: "First Our Trio meeting" },
         { src: "images/2nd Semester/S2_2.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_3.jpg", semester: 2, text: "Group study session." },
@@ -60,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
         { src: "images/2nd Semester/S2_21.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_22.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_23.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_23.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_24.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_25.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_26.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_27.jpg", semester: 2, text: "Group study session." },
@@ -68,17 +71,41 @@ document.addEventListener("DOMContentLoaded", function () {
         { src: "images/2nd Semester/S2_29.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_30.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_31.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_32.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_33.jpeg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_34.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_35.jpg", semester: 2, text: "Group study session." },
+        { src: "images/2nd Semester/S2_36.jpeg", semester: 2, text: "Group study session." },
+        ]
+        // Add up to 12 semesters
+    };
 
-        // Add more photos here
-    ];
+    Object.keys(semesters).forEach(semester => {
+        let section = document.createElement("div");
+        section.classList.add("semester-section");
+        section.id = `semester-${semester}`;
 
-    photos.forEach(photo => {
-        let imgElement = document.createElement("img");
-        imgElement.src = photo.src;
-        imgElement.classList.add("photo-item");
-        imgElement.dataset.semester = photo.semester;
-        imgElement.onclick = () => openLightbox(photo.src, photo.text);
-        photoGallery.appendChild(imgElement);
+        let title = document.createElement("h2");
+        title.classList.add("semester-title");
+        title.innerText = `Semester ${semester}`;
+        section.appendChild(title);
+
+        let grid = document.createElement("div");
+        grid.classList.add("photo-grid");
+
+        semesters[semester].forEach(photo => {
+            let img = document.createElement("img");
+            img.src = photo.src;
+            img.onclick = () => openLightbox(photo.src, photo.text);
+            grid.appendChild(img);
+        });
+
+        section.appendChild(grid);
+        photoGallery.appendChild(section);
     });
 
 });
+
+
+
+
