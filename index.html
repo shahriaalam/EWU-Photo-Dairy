@@ -3,36 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EWU Photo Dairy</title>
+    <title>EWU Photo Diary</title>
     <link rel="stylesheet" href="style.css">
     <script defer src="script.js"></script>
 </head>
 <body>
+
+    <!-- Login Screen -->
     <div id="login-screen">
-        <h2>Enter Password to Access Gallery</h2>
+        <h2>Enter Password to Access The World of Memories</h2>
         <input type="password" id="password" placeholder="Enter Password">
-        <button onclick="checkPassword()">Login</button>
+        <button id="login-btn">Login</button>
         <p id="error-message"></p>
     </div>
-    
+
+    <!-- Gallery Section -->
     <div id="gallery" class="hidden">
-        <h1>University Life Photo Gallery</h1>
+        <h1>Welcome To EWU Photo Dairy</h1>
+
+        <!-- Semester Filter Buttons -->
         <div class="semester-filter">
             <button onclick="filterSemester('all')">All Semesters</button>
             <button onclick="filterSemester(1)">Semester 1</button>
             <button onclick="filterSemester(2)">Semester 2</button>
             <!-- Add buttons for more semesters -->
         </div>
-        
+
+        <!-- Photo Grid -->
         <div class="photo-grid" id="photo-gallery">
             <!-- Photos will be dynamically added here -->
         </div>
     </div>
 
+    <!-- Lightbox -->
     <div id="lightbox" class="hidden">
         <span class="close" onclick="closeLightbox()">&times;</span>
         <img id="lightbox-img" src="">
         <p id="lightbox-text"></p>
     </div>
+
 </body>
 </html>
