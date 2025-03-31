@@ -11,9 +11,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Scroll to Semester Section
-    window.scrollToSemester = function (semesterId) {
-        const section = document.getElementById(semesterId);
+    // Scroll to Section
+    window.scrollToSection = function (sectionId) {
+        const section = document.getElementById(sectionId);
         if (section) {
             section.scrollIntoView({ behavior: "smooth" });
         }
@@ -30,15 +30,27 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("lightbox").classList.add("hidden");
     };
 
-    // Dynamically Load Photos into Semester Sections
-    const photoGallery = document.getElementById("photo-gallery");
 
-    const semesters = {
-        1: [
-            { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
-            { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
-        ],
-        2: [
+    const sections = [
+        {
+            name: "Our Family", 
+            photos: [
+            { src: "images/1st Semester/1.jpg", semester: 1, text: "Sidratul Moontaha (2021-3-60-048)" },
+            { src: "images/1st Semester/2.jpg", semester: 1, text: "B. M. Shahria Alam (2021-3-60-016)" },
+            { src: "images/1st Semester/3.jpg", semester: 1, text: "Tasmiah Rahman Orpa (2021-3-60-021)" },
+            { src: "images/1st Semester/4.jpg", semester: 1, text: "Mohammad Tahmid Noor (2021-3-60-026)" },
+            { src: "images/1st Semester/5.jpg", semester: 1, text: "Umma Habiba Ahmed (2021-3-60-047)" },
+            { src: "images/1st Semester/6.jpg", semester: 1, text: "Mahjabin Tasnim (2021-3-60-271)" },
+            { src: "images/1st Semester/7.jpg", semester: 1, text: "Ishrat Jahan Momo (2021-3-60-049)" },
+            { src: "images/1st Semester/8.jpeg", semester: 1, text: "Shaila Afroz Anika (2021-3-60-045)" },
+            { src: "images/1st Semester/9.jpg", semester: 1, text: "Rafsun Islam (2021-3-60-024)" },
+            { src: "images/1st Semester/10.jpg", semester: 1, text: "Golam Kibria (2021-3-60-215)" },
+              
+            ]
+        },
+        {
+            name: "Semester 2", 
+            photos:[
         { src: "images/2nd Semester/S2_1.1.png", semester: 2, text: "Our First Presentation" },
         { src: "images/2nd Semester/S2_1.jpg", semester: 2, text: "First Our Trio meeting" },
         { src: "images/2nd Semester/S2_2.jpg", semester: 2, text: "Group study session." },
@@ -110,15 +122,20 @@ document.addEventListener("DOMContentLoaded", function () {
         { src: "images/2nd Semester/S2_70.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_71.jpg", semester: 2, text: "Group study session." },
         { src: "images/2nd Semester/S2_72.jpg", semester: 2, text: "Group study session." },
-        ],
-        3: [
+        ]
+        },
+        {
+            name: "Semester 3", 
+            photos: [
             { src: "images/3rd Semester/S3_1.JPG", semester: 3, text: "Our First Presentation" },
             { src: "images/3rd Semester/S3_2.JPG", semester: 3, text: "First Our Trio meeting" },
             { src: "images/3rd Semester/S3_3.JPG", semester: 3, text: "Group study session." },
             { src: "images/3rd Semester/S3_4.JPG", semester: 3, text: "Group study session." },
             { src: "images/2nd Semester/S2_44.jpg", semester: 3, text: "Group study session." },
-        ],
-        4: [
+        ]
+        },
+        {   name: "Semester 4", 
+            photos: [
             { src: "images/4th Semester/S4_1.JPG", semester: 4, text: "Our First Presentation" },
             { src: "images/4th Semester/S4_2.JPG", semester: 4, text: "Our First Presentation" },
             { src: "images/4th Semester/S4_3.JPG", semester: 4, text: "Our First Presentation" },
@@ -133,8 +150,11 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/4th Semester/S4_12.JPG", semester: 4, text: "Our First Presentation" },
             { src: "images/4th Semester/S4_13.JPG", semester: 4, text: "Our First Presentation" },
             
-        ],
-        5: [
+        ]
+        },
+        {
+            name: "Semester 5", 
+            photos:[
             { src: "images/5th Semester/S5_1.JPG", semester: 5, text: "Our First Presentation" },
             { src: "images/5th Semester/S5_2.jpg", semester: 5, text: "Our First Presentation" },
             { src: "images/5th Semester/S5_3.jpg", semester: 5, text: "Our First Presentation" },
@@ -142,8 +162,11 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/5th Semester/S5_5.jpg", semester: 5, text: "Our First Presentation" },
             { src: "images/5th Semester/S5_6.jpg", semester: 5, text: "Our First Presentation" },
             { src: "images/5th Semester/S5_7.PNG", semester: 5, text: "Our First Presentation" },
-        ],
-        6: [
+        ]
+        },
+        {
+            name: "Semester 6", 
+            photos: [
             { src: "images/6th Semester/S6_1.JPG", semester: 6, text: "Our First Presentation" },
             { src: "images/6th Semester/S6_2.JPG", semester: 6, text: "Our First Presentation" },
             { src: "images/6th Semester/S6_3.JPG", semester: 6, text: "Our First Presentation" },
@@ -168,8 +191,10 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/6th Semester/S6_22.jpg", semester: 6, text: "Our First Presentation" },
             { src: "images/6th Semester/S6_23.jpg", semester: 6, text: "Our First Presentation" },
 
-        ],
-        7: [
+        ]
+        },
+        {   name: "Semester 7", 
+            photos:[
             { src: "images/7th Semester/S7_1.jpg", semester: 7, text: "Our First Presentation" },
             { src: "images/7th Semester/S7_2.jpg", semester: 7, text: "Our First Presentation" },
             { src: "images/7th Semester/S7_3.jpg", semester: 7, text: "Our First Presentation" },
@@ -214,10 +239,13 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/7th Semester/S7_42.jpg", semester: 7, text: "Our First Presentation" },
             { src: "images/7th Semester/S7_43.jpg", semester: 7, text: "Our First Presentation" },
             
-        ],
-        8: [
-            { src: "images/8th Semester/S8_1.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_2.jpg", semester: 8, text: "Our First Presentation" },
+        ]
+        },
+        {   name: "Semester 8", 
+            photos:
+            [
+            { src: "images/8th Semester/S8_1.jpg", semester: 8, text: "Our First Presentation" },
+            { src: "images/8th Semester/S8_2.jpeg", semester: 8, text: "Our First Presentation" },
             { src: "images/8th Semester/S8_3.jpg", semester: 8, text: "Our First Presentation" },
             { src: "images/8th Semester/S8_4.jpg", semester: 8, text: "Our First Presentation" },
             { src: "images/8th Semester/S8_5.jpg", semester: 8, text: "Our First Presentation" },
@@ -258,34 +286,30 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/8th Semester/S8_40.jpg", semester: 8, text: "Our First Presentation" },
             { src: "images/8th Semester/S8_41.jpg", semester: 8, text: "Our First Presentation" },
             { src: "images/8th Semester/S8_42.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_43.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_44.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_45.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_46.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_47.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_48.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_49.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_50.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_51.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_52.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_53.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_54.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_55.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_56.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_57.jpg", semester: 8, text: "Our First Presentation" },
+            { src: "images/8th Semester/S8_43.jpg", semester: 8, text: "Our First Presentation" }
             
-        ],
-        9: [
+        ]
+        },
+        {
+            name: "Semester 9", 
+            photos:[
             { src: "images/9th Semester/S9_1.jpeg", semester: 9, text: "Our First Presentation" },
             { src: "images/9th Semester/S9_2.jpg", semester: 9, text: "Our First Presentation" },
             { src: "images/9th Semester/S9_3.jpg", semester: 9, text: "Our First Presentation" },
             
-        ],
-        10: [
+        ]
+        },
+        {
+            name: "Semester 10", 
+            photos: [
             { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
             { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
-        ],
-        11: [
+        ]
+        },
+
+        {
+            name: "Semester 11", 
+            photos:[
             { src: "images/11th Semester/S11_1.jpg", semester: 11, text: "Our First Presentation" },
             { src: "images/11th Semester/S11_2.jpg", semester: 11, text: "Our First Presentation" },
             { src: "images/11th Semester/S11_3.jpg", semester: 11, text: "Our First Presentation" },
@@ -321,40 +345,44 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/11th Semester/S11_33.jpg", semester: 11, text: "Our First Presentation" },
             { src: "images/11th Semester/S11_34.jpg", semester: 11, text: "Our First Presentation" },
             { src: "images/11th Semester/S11_35.jpeg", semester: 11, text: "Our First Presentation" },
-        ],
-        12: [
+        ]
+        },
+        {
+            name: "Semester 12", 
+            photos: [
             { src: "images/1st Semester/S1_1.jpg", text: "First Day at University" },
             { src: "images/1st Semester/S1_2.jpg", text: "Lab Session" }
-        ],
+        ]
+        }
         // Add up to 12 semesters
-    };
+    ];
 
-    Object.keys(semesters).forEach(semester => {
-        let section = document.createElement("div");
-        section.classList.add("semester-section");
-        section.id = `semester-${semester}`;
+    const photoGallery = document.getElementById("photo-gallery");
 
+    // Generate Sections Dynamically
+    sections.forEach((section, index) => {
+        let sectionDiv = document.createElement("div");
+        sectionDiv.classList.add("semester-section");
+        sectionDiv.id = `section-${index + 1}`;
+
+        // Create the title of the section
         let title = document.createElement("h2");
         title.classList.add("semester-title");
-        title.innerText = `Semester ${semester}`;
-        section.appendChild(title);
+        title.innerText = section.name;
+        sectionDiv.appendChild(title);
 
+        // Create the photo grid
         let grid = document.createElement("div");
         grid.classList.add("photo-grid");
 
-        semesters[semester].forEach(photo => {
+        section.photos.forEach(photo => {
             let img = document.createElement("img");
             img.src = photo.src;
             img.onclick = () => openLightbox(photo.src, photo.text);
             grid.appendChild(img);
         });
 
-        section.appendChild(grid);
-        photoGallery.appendChild(section);
+        sectionDiv.appendChild(grid);
+        photoGallery.appendChild(sectionDiv);
     });
-
 });
-
-
-
-
