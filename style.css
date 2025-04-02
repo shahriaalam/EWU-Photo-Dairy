@@ -49,6 +49,7 @@ body {
 
 /* Semester Buttons */
 .semester-filter button {
+    position: sticky;
     margin: 5px;
     padding: 10px 15px;
     border: none;
@@ -131,3 +132,4 @@ body {
     color: white;
     cursor: pointer;
 }
+
