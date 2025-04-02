@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Password Protection
     document.getElementById("login-btn").addEventListener("click", function () {
         const passwordInput = document.getElementById("password").value;
-        if (passwordInput === "1") {
+        if (passwordInput === "fall21") {
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("gallery").classList.remove("hidden");
         } else {
