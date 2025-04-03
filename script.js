@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (passwordInput === "fall21") {
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("gallery").classList.remove("hidden");
+            
+            // Scroll to the top of the page after login
+            window.scrollTo(0, 0);
         } else {
             document.getElementById("error-message").innerText = "Incorrect password!";
         }
@@ -167,6 +170,19 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/4th Semester/S4_29.JPG", semester: 4, text: "4th Semester" },
             { src: "images/4th Semester/S4_30.JPG", semester: 4, text: "4th Semester" },
             { src: "images/4th Semester/S4_31.JPG", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_32.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_33.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_34.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_35.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_36.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_37.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_38.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_39.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_40.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_41.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_42.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_43.jpg", semester: 4, text: "4th Semester" },
+            { src: "images/4th Semester/S4_44.jpg", semester: 4, text: "4th Semester" },
            
         ]
         },
@@ -611,6 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/9th Semester/S9_52.jpeg", semester: 9, text: "9th Semester" },
             { src: "images/9th Semester/S9_53.jpeg", semester: 9, text: "9th Semester" },
             { src: "images/9th Semester/S9_54.jpeg", semester: 9, text: "9th Semester" },
+            { src: "images/9th Semester/S9_55.jpg", semester: 9, text: "9th Semester" },
             
         ]
         },
