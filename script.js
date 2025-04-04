@@ -13,6 +13,13 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("error-message").innerText = "Incorrect password!";
         }
     });
+    // Password Protection - Enter Key Press
+    document.getElementById("password").addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault();  // Prevent form submission or other default actions
+        document.getElementById("login-btn").click();  // Trigger the login button click event
+    }
+    });
 
     // Slideshow functionality
     let slideIndex = 0;
