@@ -211,9 +211,9 @@ body {
     position: relative;
     z-index: 1;
     text-align: center;
-    padding: 1px;
+    padding: 0px;
     background-color: #f4f4f4;
     font-size: 16px;
     margin-top: auto; /* Ensures footer always stays at the bottom */
-    margin-bottom: 2px;
+    margin-bottom: 0px;
 }
