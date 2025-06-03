@@ -1177,7 +1177,6 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/11th Semester/S11_205.jpeg", semester: 11, text: "11th Semester" },
             { src: "images/11th Semester/S11_206.jpeg", semester: 11, text: "11th Semester" },
             { src: "images/11th Semester/S11_2077.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_208.webp", semester: 11, text: "11th Semester" },
             
         ]
     },
