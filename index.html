@@ -57,6 +57,9 @@
             <button onclick="scrollToSection('section-10')">Semester 10</button>
             <button onclick="scrollToSection('section-11')">Semester 11</button>
             <button onclick="scrollToSection('section-12')">Semester 12</button>
+            <button onclick="scrollToSection('section-13')">Convocation</button>
+            <button onclick="scrollToSection('section-14')">Gibli Art</button>
+            <button onclick="scrollToSection('section-15')">Others</button>
         </div>
     </head>
         <!-- Semester Sections -->
@@ -66,11 +69,22 @@
     </div>
 
     <!-- Lightbox -->
-    <div id="lightbox" class="hidden">
-        <span class="close" onclick="closeLightbox()">&times;</span>
+<div id="lightbox" class="hidden">
+    <span class="close" onclick="closeLightbox()">&times;</span>
+    <button class="lightbox-nav" id="prev-btn" onclick="navigateLightbox(-1)">&#10094;</button>
+    <div class="lightbox-content">
         <img id="lightbox-img" src="">
         <p id="lightbox-text"></p>
     </div>
+    <button class="lightbox-nav" id="next-btn" onclick="navigateLightbox(1)">&#10095;</button>
+</div>
+
+    <!-- Music -->
+<audio id="bg-music" loop>
+<source src="/EWU-Photo-Dairy/BG.mp3" type="audio/mpeg">
+</audio>
+<button id="music-btn" onclick="toggleMusic()" title="Toggle Music">🎵</button>
+
 
     <!-- Footer Section -->
 <footer id="footer">

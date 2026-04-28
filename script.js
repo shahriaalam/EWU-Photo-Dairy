@@ -43,16 +43,74 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    // Lightbox Functionality
-    window.openLightbox = function (imgSrc, imgText) {
-        document.getElementById("lightbox-img").src = imgSrc;
-        document.getElementById("lightbox-text").innerText = imgText;
-        document.getElementById("lightbox").classList.remove("hidden");
-    };
+    // Flat list of all photos across all sections for navigation
+let allPhotos = [];
+let currentPhotoIndex = 0;
 
-    window.closeLightbox = function () {
-        document.getElementById("lightbox").classList.add("hidden");
+// Build flat photo list after sections are rendered
+function buildPhotoList() {
+    allPhotos = [];
+    sections.forEach(section => {
+        section.photos.forEach(photo => allPhotos.push(photo));
+    });
+}
+
+window.openLightbox = function (imgSrc, imgText) {
+    currentPhotoIndex = allPhotos.findIndex(p => p.src === imgSrc);
+    document.getElementById("lightbox-img").src = imgSrc;
+    document.getElementById("lightbox-text").innerText = imgText;
+    document.getElementById("lightbox").classList.remove("hidden");
+};
+
+window.closeLightbox = function () {
+    document.getElementById("lightbox").classList.add("hidden");
+};
+
+window.navigateLightbox = function (direction) {
+    currentPhotoIndex += direction;
+    if (currentPhotoIndex < 0) currentPhotoIndex = allPhotos.length - 1;
+    if (currentPhotoIndex >= allPhotos.length) currentPhotoIndex = 0;
+
+    const photo = allPhotos[currentPhotoIndex];
+    document.getElementById("lightbox-img").src = photo.src;
+    document.getElementById("lightbox-text").innerText = photo.text;
+};
+
+// Music
+const music = document.getElementById("bg-music");
+const musicBtn = document.getElementById("music-btn");
+music.volume = 0.3;
+
+// Try autoplay immediately on page load
+music.play().catch(() => {
+    // Browser blocked autoplay — wait for first interaction
+    const startOnInteraction = () => {
+        music.play().catch(() => {});
+        document.removeEventListener("click", startOnInteraction);
+        document.removeEventListener("keydown", startOnInteraction);
     };
+    document.addEventListener("click", startOnInteraction);
+    document.addEventListener("keydown", startOnInteraction);
+});
+
+window.toggleMusic = function () {
+    if (music.paused) {
+        music.play();
+        musicBtn.innerHTML = "🎵";
+    } else {
+        music.pause();
+        musicBtn.innerHTML = "🔇";
+    }
+};
+
+// Keyboard arrow key support
+document.addEventListener("keydown", function (e) {
+    if (!document.getElementById("lightbox").classList.contains("hidden")) {
+        if (e.key === "ArrowRight") navigateLightbox(1);
+        if (e.key === "ArrowLeft") navigateLightbox(-1);
+        if (e.key === "Escape") closeLightbox();
+    }
+});
 
 
     const sections = [
@@ -67,8 +125,8 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/1st Semester/6.jpg", semester: 1, text: "Mahjabin Tasnim (2021-3-60-271)" },
             { src: "images/1st Semester/7.jpg", semester: 1, text: "Ishrat Jahan Momo (2021-3-60-049)" },
             { src: "images/1st Semester/8.jpeg", semester: 1, text: "Shaila Afroz Anika (2021-3-60-045)" },
-            { src: "images/1st Semester/9.jpg", semester: 1, text: "Rafsun Islam (2021-3-60-024)" },
-            { src: "images/1st Semester/10.jpg", semester: 1, text: "Golam Kibria (2021-3-60-215)" },
+            // { src: "images/1st Semester/9.jpg", semester: 1, text: "Rafsun Islam (2021-3-60-024)" },
+            // { src: "images/1st Semester/10.jpg", semester: 1, text: "Golam Kibria (2021-3-60-215)" },
               
             ]
         },
@@ -1176,7 +1234,6 @@ document.addEventListener("DOMContentLoaded", function () {
             { src: "images/11th Semester/S11_204.jpg", semester: 11, text: "11th Semester" },
             { src: "images/11th Semester/S11_205.jpeg", semester: 11, text: "11th Semester" },
             { src: "images/11th Semester/S11_206.jpeg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_2077.jpg", semester: 11, text: "11th Semester" },
             
         ]
     },
@@ -1185,8 +1242,43 @@ document.addEventListener("DOMContentLoaded", function () {
             photos: [
 
         ]
-        }
-        // Add up to 12 semesters
+        },
+        {
+            name: "Convocation", 
+            photos: [
+
+        ]
+        },
+        {
+            name: "Gibli Art", 
+            photos: [
+            { src: "images/Gibli Art/1.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/2.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/3.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/4.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/5.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/6.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/7.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/8.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/9.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/10.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/11.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/12.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/13.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/14.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/15.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/16.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/17.png", semester: 11, text: "Our First Presentation" },
+            { src: "images/Gibli Art/18.png", semester: 11, text: "Our First Presentation" },
+        ]
+        },
+         {
+            name: "Others", 
+            photos: [
+
+        ]
+        },
+    
     ];
 
     const photoGallery = document.getElementById("photo-gallery");
@@ -1216,5 +1308,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         sectionDiv.appendChild(grid);
         photoGallery.appendChild(sectionDiv);
+        buildPhotoList();
     });
 });
