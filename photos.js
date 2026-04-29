@@ -5,35 +5,35 @@ const SECTIONS = [
     "photos": [
       {
         "src": "images/1st Semester/1.jpg",
-        "text": "Our Family"
+        "text": "Sidratul Moontaha (2021-3-60-048)"
       },
       {
         "src": "images/1st Semester/2.jpg",
-        "text": "Our Family"
+        "text": "B. M. Shahria Alam (2021-3-60-016)"
       },
       {
         "src": "images/1st Semester/3.jpg",
-        "text": "Our Family"
+        "text": "Tasmiah Rahman Orpa (2021-3-60-021)"
       },
       {
         "src": "images/1st Semester/4.jpg",
-        "text": "Our Family"
+        "text": "Mohammad Tahmid Noor (2021-3-60-026)"
       },
       {
         "src": "images/1st Semester/5.jpg",
-        "text": "Our Family"
+        "text": "Umma Habiba Ahmed (2021-3-60-047)"
       },
       {
         "src": "images/1st Semester/6.jpg",
-        "text": "Our Family"
+        "text": "Mahjabin Tasnim (2021-3-60-271)"
       },
       {
         "src": "images/1st Semester/7.jpg",
-        "text": "Our Family"
+        "text": "Ishrat Jahan Momo (2021-3-60-049)"
       },
       {
         "src": "images/1st Semester/8.jpeg",
-        "text": "Our Family"
+        "text": "Shaila Afroz Anika (2021-3-60-045)"
       }
     ]
   },
