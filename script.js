@@ -1,1313 +1,223 @@
 document.addEventListener("DOMContentLoaded", function () {
-    
-    // Password Protection
-    document.getElementById("login-btn").addEventListener("click", function () {
-        const passwordInput = document.getElementById("password").value;
-        if (passwordInput === "fall21") {
-            document.getElementById("login-screen").classList.add("hidden");
-            document.getElementById("gallery").classList.remove("hidden");
-            
-            // Scroll to the top of the page after login
-            window.scrollTo(0, 0);
-        } else {
-            document.getElementById("error-message").innerText = "Incorrect password!";
-        }
-    });
-    // Password Protection - Enter Key Press
-    document.getElementById("password").addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        event.preventDefault();  // Prevent form submission or other default actions
-        document.getElementById("login-btn").click();  // Trigger the login button click event
+
+  // ── Password Protection ──────────────────────────────────────────────────────
+  const loginBtn = document.getElementById("login-btn");
+  const passwordInput = document.getElementById("password");
+
+  function attemptLogin() {
+    if (passwordInput.value === "fall21") {
+      document.getElementById("login-screen").classList.add("hidden");
+      document.getElementById("gallery").classList.remove("hidden");
+      window.scrollTo(0, 0);
+      initGallery();
+    } else {
+      const err = document.getElementById("error-message");
+      err.innerText = "Incorrect password!";
+      passwordInput.classList.add("shake");
+      setTimeout(() => passwordInput.classList.remove("shake"), 500);
     }
+  }
+
+  loginBtn.addEventListener("click", attemptLogin);
+  passwordInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); attemptLogin(); }
+  });
+
+  // ── Slideshow ────────────────────────────────────────────────────────────────
+  let slideIndex = 0;
+  const slides = document.getElementsByClassName("mySlides");
+
+  function showSlides() {
+    Array.from(slides).forEach(s => s.style.display = "none");
+    slideIndex = (slideIndex % slides.length) + 1;
+    if (slides[slideIndex - 1]) slides[slideIndex - 1].style.display = "block";
+    setTimeout(showSlides, 3500);
+  }
+  if (slides.length) showSlides();
+
+  // ── Music ────────────────────────────────────────────────────────────────────
+  const music = document.getElementById("bg-music");
+  const musicBtn = document.getElementById("music-btn");
+  if (music) {
+    music.volume = 0.3;
+    music.play().catch(() => {
+      const startOnce = () => {
+        music.play().catch(() => {});
+        document.removeEventListener("click", startOnce);
+        document.removeEventListener("keydown", startOnce);
+      };
+      document.addEventListener("click", startOnce);
+      document.addEventListener("keydown", startOnce);
+    });
+  }
+
+  window.toggleMusic = function () {
+    if (!music) return;
+    if (music.paused) { music.play(); musicBtn.innerHTML = "🎵"; }
+    else { music.pause(); musicBtn.innerHTML = "🔇"; }
+  };
+
+  // ── Scroll to section ────────────────────────────────────────────────────────
+  window.scrollToSection = function (sectionId) {
+    const el = document.getElementById(sectionId);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // ── Gallery init ─────────────────────────────────────────────────────────────
+  let allPhotos = [];
+
+  function initGallery() {
+    // SECTIONS comes from photos.js (auto-generated) or falls back to inline
+    const sections = (typeof SECTIONS !== "undefined") ? SECTIONS : FALLBACK_SECTIONS;
+
+    allPhotos = sections.flatMap(s => s.photos);
+
+    const container = document.getElementById("photo-gallery");
+    container.innerHTML = "";
+
+    sections.forEach((section, index) => {
+      if (section.photos.length === 0) return; // skip empty sections
+
+      const sectionDiv = document.createElement("div");
+      sectionDiv.classList.add("semester-section");
+      sectionDiv.id = `section-${index + 1}`;
+
+      // Header
+      const header = document.createElement("div");
+      header.classList.add("section-header");
+
+      const title = document.createElement("h2");
+      title.classList.add("semester-title");
+      title.innerText = section.name;
+
+      const badge = document.createElement("span");
+      badge.classList.add("photo-count");
+      badge.innerText = `${section.photos.length} photos`;
+
+      header.appendChild(title);
+      header.appendChild(badge);
+      sectionDiv.appendChild(header);
+
+      // Masonry grid
+      const grid = document.createElement("div");
+      grid.classList.add("photo-grid");
+
+      section.photos.forEach((photo, photoIndex) => {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("photo-item");
+
+        const img = document.createElement("img");
+        img.dataset.src = photo.src;   // lazy load
+        img.alt = photo.text || section.name;
+        img.classList.add("lazy");
+        img.onclick = () => openLightbox(photo.src, photo.text, allPhotos.findIndex(p => p.src === photo.src));
+
+        const overlay = document.createElement("div");
+        overlay.classList.add("photo-overlay");
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(overlay);
+        grid.appendChild(wrapper);
+      });
+
+      sectionDiv.appendChild(grid);
+      container.appendChild(sectionDiv);
     });
 
-    // Slideshow functionality
-    let slideIndex = 0;
-    showSlides();
+    initLazyLoad();
+    updateNavBadges(sections);
+    document.dispatchEvent(new Event('gallerydone'));
+  }
 
-    function showSlides() {
-        let slides = document.getElementsByClassName("mySlides");
-        for (let i = 0; i < slides.length; i++) {
-            slides[i].style.display = "none";  
-        }
-        slideIndex++;
-        if (slideIndex > slides.length) {slideIndex = 1}    
-        slides[slideIndex-1].style.display = "block";  
-        setTimeout(showSlides, 3000); // Change image every 3 seconds
+  // ── Lazy Loading ─────────────────────────────────────────────────────────────
+  function initLazyLoad() {
+    const lazyImgs = document.querySelectorAll("img.lazy");
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            img.classList.remove("lazy");
+            img.classList.add("loaded");
+            observer.unobserve(img);
+          }
+        });
+      }, { rootMargin: "200px 0px" });
+      lazyImgs.forEach(img => observer.observe(img));
+    } else {
+      lazyImgs.forEach(img => { img.src = img.dataset.src; img.classList.add("loaded"); });
     }
-    // Scroll to Section
-    window.scrollToSection = function (sectionId) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            section.scrollIntoView({ behavior: "smooth" });
-        }
-    };
+  }
 
-    // Flat list of all photos across all sections for navigation
-let allPhotos = [];
-let currentPhotoIndex = 0;
-
-// Build flat photo list after sections are rendered
-function buildPhotoList() {
-    allPhotos = [];
-    sections.forEach(section => {
-        section.photos.forEach(photo => allPhotos.push(photo));
+  // ── Nav badges ───────────────────────────────────────────────────────────────
+  function updateNavBadges(sections) {
+    document.querySelectorAll(".semester-filter button[data-index]").forEach(btn => {
+      const idx = parseInt(btn.dataset.index);
+      const section = sections[idx];
+      if (section && section.photos.length > 0) {
+        const span = document.createElement("span");
+        span.classList.add("nav-badge");
+        span.textContent = section.photos.length;
+        btn.appendChild(span);
+      }
     });
-}
+  }
 
-window.openLightbox = function (imgSrc, imgText) {
-    currentPhotoIndex = allPhotos.findIndex(p => p.src === imgSrc);
-    document.getElementById("lightbox-img").src = imgSrc;
-    document.getElementById("lightbox-text").innerText = imgText;
-    document.getElementById("lightbox").classList.remove("hidden");
-};
+  // ── Lightbox ─────────────────────────────────────────────────────────────────
+  let currentPhotoIndex = 0;
 
-window.closeLightbox = function () {
+  window.openLightbox = function (imgSrc, imgText, index) {
+    currentPhotoIndex = (index !== undefined) ? index : allPhotos.findIndex(p => p.src === imgSrc);
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lightbox-img");
+    lbImg.classList.remove("lb-ready");
+    lbImg.src = imgSrc;
+    lbImg.onload = () => lbImg.classList.add("lb-ready");
+    document.getElementById("lightbox-text").innerText = imgText || "";
+    document.getElementById("lb-counter").innerText = `${currentPhotoIndex + 1} / ${allPhotos.length}`;
+    lb.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  };
+
+  window.closeLightbox = function () {
     document.getElementById("lightbox").classList.add("hidden");
-};
+    document.body.style.overflow = "";
+  };
 
-window.navigateLightbox = function (direction) {
+  window.navigateLightbox = function (direction) {
     currentPhotoIndex += direction;
     if (currentPhotoIndex < 0) currentPhotoIndex = allPhotos.length - 1;
     if (currentPhotoIndex >= allPhotos.length) currentPhotoIndex = 0;
-
     const photo = allPhotos[currentPhotoIndex];
-    document.getElementById("lightbox-img").src = photo.src;
-    document.getElementById("lightbox-text").innerText = photo.text;
-};
+    const lbImg = document.getElementById("lightbox-img");
+    lbImg.classList.remove("lb-ready");
+    lbImg.src = photo.src;
+    lbImg.onload = () => lbImg.classList.add("lb-ready");
+    document.getElementById("lightbox-text").innerText = photo.text || "";
+    document.getElementById("lb-counter").innerText = `${currentPhotoIndex + 1} / ${allPhotos.length}`;
+  };
 
-// Music
-const music = document.getElementById("bg-music");
-const musicBtn = document.getElementById("music-btn");
-music.volume = 0.3;
+  // Close on backdrop click
+  document.getElementById("lightbox").addEventListener("click", function (e) {
+    if (e.target === this) closeLightbox();
+  });
 
-// Try autoplay immediately on page load
-music.play().catch(() => {
-    // Browser blocked autoplay — wait for first interaction
-    const startOnInteraction = () => {
-        music.play().catch(() => {});
-        document.removeEventListener("click", startOnInteraction);
-        document.removeEventListener("keydown", startOnInteraction);
-    };
-    document.addEventListener("click", startOnInteraction);
-    document.addEventListener("keydown", startOnInteraction);
-});
-
-window.toggleMusic = function () {
-    if (music.paused) {
-        music.play();
-        musicBtn.innerHTML = "🎵";
-    } else {
-        music.pause();
-        musicBtn.innerHTML = "🔇";
-    }
-};
-
-// Keyboard arrow key support
-document.addEventListener("keydown", function (e) {
+  // Keyboard navigation
+  document.addEventListener("keydown", function (e) {
     if (!document.getElementById("lightbox").classList.contains("hidden")) {
-        if (e.key === "ArrowRight") navigateLightbox(1);
-        if (e.key === "ArrowLeft") navigateLightbox(-1);
-        if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") navigateLightbox(1);
+      if (e.key === "ArrowLeft")  navigateLightbox(-1);
+      if (e.key === "Escape")     closeLightbox();
     }
-});
+  });
 
+  // Touch swipe for lightbox
+  let touchStartX = 0;
+  document.getElementById("lightbox").addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; });
+  document.getElementById("lightbox").addEventListener("touchend", e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) navigateLightbox(diff > 0 ? 1 : -1);
+  });
 
-    const sections = [
-        {
-            name: "Our Family", 
-            photos: [
-            { src: "images/1st Semester/1.jpg", semester: 1, text: "Sidratul Moontaha (2021-3-60-048)" },
-            { src: "images/1st Semester/2.jpg", semester: 1, text: "B. M. Shahria Alam (2021-3-60-016)" },
-            { src: "images/1st Semester/3.jpg", semester: 1, text: "Tasmiah Rahman Orpa (2021-3-60-021)" },
-            { src: "images/1st Semester/4.jpg", semester: 1, text: "Mohammad Tahmid Noor (2021-3-60-026)" },
-            { src: "images/1st Semester/5.jpg", semester: 1, text: "Umma Habiba Ahmed (2021-3-60-047)" },
-            { src: "images/1st Semester/6.jpg", semester: 1, text: "Mahjabin Tasnim (2021-3-60-271)" },
-            { src: "images/1st Semester/7.jpg", semester: 1, text: "Ishrat Jahan Momo (2021-3-60-049)" },
-            { src: "images/1st Semester/8.jpeg", semester: 1, text: "Shaila Afroz Anika (2021-3-60-045)" },
-            // { src: "images/1st Semester/9.jpg", semester: 1, text: "Rafsun Islam (2021-3-60-024)" },
-            // { src: "images/1st Semester/10.jpg", semester: 1, text: "Golam Kibria (2021-3-60-215)" },
-              
-            ]
-        },
-        {
-            name: "Semester 2", 
-            photos:[
-        { src: "images/2nd Semester/S2_1.1.png", semester: 2, text: "Our First Presentation" },
-        { src: "images/2nd Semester/S2_1.jpg", semester: 2, text: "First Our Trio meeting" },
-        { src: "images/2nd Semester/S2_2.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_3.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_4.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_5.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_6.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_7.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_8.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_52.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_9.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_10.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_11.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_12.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_13.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_14.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_15.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_16.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_17.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_18.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_19.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_20.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_21.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_22.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_23.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_24.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_25.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_26.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_27.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_28.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_29.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_30.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_31.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_32.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_33.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_34.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_35.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_36.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_37.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_38.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_39.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_40.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_41.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_42.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_45.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_46.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_47.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_48.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_49.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_50.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_51.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_53.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_54.png", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_55.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_56.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_57.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_58.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_59.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_60.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_61.jpeg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_62.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_63.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_64.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_65.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_66.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_67.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_68.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_69.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_70.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_71.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_72.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_73.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_74.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_75.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_76.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_77.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_78.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_79.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_80.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_81.jpg", semester: 2, text: "Group study session." },
-        { src: "images/2nd Semester/S2_82.jpg", semester: 2, text: "Group study session." },
-       
-        ]
-        },
-        {
-            name: "Semester 3", 
-            photos: [
-            { src: "images/3rd Semester/S3_1.JPG", semester: 3, text: "Our First Presentation" },
-            { src: "images/3rd Semester/S3_2.JPG", semester: 3, text: "First Our Trio meeting" },
-            { src: "images/3rd Semester/S3_3.JPG", semester: 3, text: "Group study session." },
-            { src: "images/3rd Semester/S3_4.JPG", semester: 3, text: "Group study session." },
-            { src: "images/2nd Semester/S2_44.jpg", semester: 3, text: "Group study session." },
-            { src: "images/3rd Semester/S3_5.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_6.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_7.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_8.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_9.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_10.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_11.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_12.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_13.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_14.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_15.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_16.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_17.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_18.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_19.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_20.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_21.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_22.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_23.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_24.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_25.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_26.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_27.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_28.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_29.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_30.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_31.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_32.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_33.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_34.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_35.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_36.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_37.jpg", semester: 3, text: "3rd Semester" },
-            { src: "images/3rd Semester/S3_38.jpg", semester: 3, text: "3rd Semester" },
-    
-        ]
-        },
-        {   name: "Semester 4", 
-            photos: [
-            { src: "images/4th Semester/S4_1.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_2.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_3.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_4.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_5.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_6.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_7.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_8.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_9.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_10.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_11.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_12.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_13.JPG", semester: 4, text: "Our First Presentation" },
-            { src: "images/4th Semester/S4_14.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_15.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_16.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_17.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_18.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_19.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_20.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_21.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_22.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_23.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_24.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_25.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_26.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_27.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_28.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_29.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_30.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_31.JPG", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_32.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_33.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_34.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_35.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_36.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_37.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_38.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_39.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_40.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_41.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_42.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_43.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_44.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_45.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_46.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_47.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_48.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_49.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_50.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_51.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_52.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_53.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_54.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_55.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_56.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_57.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_58.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_59.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_60.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_61.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_62.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_63.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_64.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_65.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_66.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_67.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_68.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_69.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_70.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_71.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_72.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_73.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_74.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_75.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_76.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_77.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_78.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_79.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_80.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_81.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_82.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_83.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_84.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_85.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_86.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_87.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_88.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_89.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_90.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_91.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_92.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_93.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_94.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_95.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_96.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_97.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_98.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_99.jpg", semester: 4, text: "4th Semester" },
-            { src: "images/4th Semester/S4_100.jpg", semester: 4, text: "4th Semester" },
-           
-        ]
-        },
-        {
-            name: "Semester 5", 
-            photos:[
-            { src: "images/5th Semester/S5_1.JPG", semester: 5, text: "Our First Presentation" },
-            { src: "images/5th Semester/S5_2.jpg", semester: 5, text: "Our First Presentation" },
-            { src: "images/5th Semester/S5_3.jpg", semester: 5, text: "Our First Presentation" },
-            { src: "images/5th Semester/S5_4.jpg", semester: 5, text: "Our First Presentation" },
-            { src: "images/5th Semester/S5_5.jpg", semester: 5, text: "Our First Presentation" },
-            { src: "images/5th Semester/S5_6.jpg", semester: 5, text: "Our First Presentation" },
-            { src: "images/5th Semester/S5_7.PNG", semester: 5, text: "Our First Presentation" },
-            { src: "images/5th Semester/S5_8.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_9.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_10.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_11.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_12.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_13.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_14.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_15.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_16.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_17.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_18.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_19.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_20.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_21.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_22.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_23.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_24.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_25.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_26.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_27.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_28.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_29.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_30.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_31.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_32.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_33.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_34.jpeg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_35.JPG", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_36.JPG", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_37.jpg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_38.jpg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_39.jpg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_40.jpg", semester: 5, text: "5th Semester" },
-            { src: "images/5th Semester/S5_41.jpg", semester: 5, text: "5th Semester" },
-            
-        ]
-        },
-        {
-            name: "Semester 6", 
-            photos: [
-             { src: "images/6th Semester/S6_1.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_2.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_3.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_4.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_5.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_6.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_7.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_8.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_9.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_10.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_11.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_12.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_13.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_14.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_15.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_16.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_17.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_18.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_19.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_20.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_21.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_22.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_23.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_24.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_25.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_26.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_27.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_28.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_29.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_30.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_31.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_32.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_33.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_34.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_35.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_36.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_37.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_38.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_39.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_40.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_41.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_42.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_43.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_44.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_45.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_46.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_47.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_48.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_49.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_50.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_51.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_52.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_53.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_54.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_55.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_56.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_57.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_58.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_59.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_60.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_61.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_62.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_63.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_64.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_65.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_66.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_67.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_68.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_69.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_70.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_71.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_72.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_73.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_74.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_75.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_76.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_77.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_78.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_79.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_80.jpeg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_81.jpg", semester: 6, text: "6th Semester" },
-             { src: "images/6th Semester/S6_82.jpg", semester: 6, text: "6th Semester" },
-            { src: "images/6th Semester/S6_83.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_84.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_85.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_86.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_87.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_88.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_89.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_90.JPG", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_91.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_92.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_93.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_94.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_95.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_96.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_97.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_98.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_99.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_100.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_101.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_102.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_103.jpg", semester: 6, text: "Our First Presentation" },
-            { src: "images/6th Semester/S6_104.jpg", semester: 6, text: "Our First Presentation" },
-            
-        ]
-        },
-        {   name: "Semester 7", 
-            photos:[
-            { src: "images/7th Semester/S7_1.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_2.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_3.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_4.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_5.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_6.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_7.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_8.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_9.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_10.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_11.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_12.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_13.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_14.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_15.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_16.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_17.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_18.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_19.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_20.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_21.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_22.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_23.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_24.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_25.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_26.jpeg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_27.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_28.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_29.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_30.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_31.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_32.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_33.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_34.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_35.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_36.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_37.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_38.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_39.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_40.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_41.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_42.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_43.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_44.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_45.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_46.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_47.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_48.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_49.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_50.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_51.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_52.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_53.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_54.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_55.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_56.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_57.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_58.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_59.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_60.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_61.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_62.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_63.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_64.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_65.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_66.jpg", semester: 7, text: "7th Semester" },
-            { src: "images/7th Semester/S7_67.jpg", semester: 7, text: "7th Semester" },
-            
-        ]
-        },
-        {   name: "Semester 8", 
-            photos:
-            [
-             { src: "images/8th Semester/S8_1.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_2.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_3.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_4.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_5.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_6.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_7.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_8.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_9.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_10.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_11.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_12.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_13.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_14.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_15.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_16.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_17.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_18.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_19.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_20.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_21.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_22.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_23.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_24.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_25.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_26.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_27.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_28.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_29.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_30.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_31.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_32.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_33.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_34.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_35.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_36.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_37.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_38.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_39.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_40.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_41.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_42.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_43.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_44.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_45.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_46.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_47.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_48.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_49.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_50.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_51.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_52.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_53.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_54.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_55.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_56.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_57.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_58.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_59.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_60.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_61.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_62.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_63.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_64.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_65.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_66.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_67.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_68.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_69.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_70.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_71.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_72.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_73.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_74.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_75.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_76.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_77.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_78.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_79.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_80.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_81.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_82.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_83.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_84.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_85.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_86.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_87.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_88.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_89.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_90.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_91.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_92.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_93.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_94.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_95.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_96.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_97.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_98.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_99.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_100.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_101.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_102.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_103.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_104.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_105.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_106.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_107.jpeg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_108.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_109.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_110.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_111.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_112.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_113.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_114.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_115.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_116.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_117.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_118.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_119.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_120.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_121.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_122.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_123.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_124.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_125.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_126.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_127.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_128.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_129.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_130.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_131.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_132.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_133.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_134.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_135.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_136.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_137.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_138.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_139.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_140.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_141.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_142.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_143.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_144.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_145.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_146.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_147.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_148.jpg", semester: 8, text: "Our First Presentation" },
-            { src: "images/8th Semester/S8_149.jpg", semester: 8, text: "Our First Presentation" }
-            
-        ]
-        },
-        {
-            name: "Semester 9", 
-            photos:[
-            { src: "images/9th Semester/S9_1.jpeg", semester: 9, text: "Our First Presentation" },
-            { src: "images/9th Semester/S9_2.jpg", semester: 9, text: "Our First Presentation" },
-            { src: "images/9th Semester/S9_3.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_4.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_5.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_6.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_7.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_8.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_9.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_10.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_11.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_12.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_13.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_14.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_15.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_16.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_17.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_18.jpg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_19.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_20.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_21.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_22.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_23.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_24.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_25.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_26.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_27.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_28.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_29.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_30.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_31.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_32.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_33.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_34.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_35.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_36.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_37.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_38.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_39.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_40.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_41.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_42.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_43.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_44.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_45.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_46.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_47.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_48.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_49.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_50.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_51.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_52.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_53.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_54.jpeg", semester: 9, text: "9th Semester" },
-            { src: "images/9th Semester/S9_55.jpg", semester: 9, text: "9th Semester" },
-            
-        ]
-        },
-        {
-            name: "Semester 10", 
-            photos: [
-                { src: "images/10th Semester/S10_1.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_2.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_3.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_4.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_5.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_6.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_7.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_8.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_9.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_10.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_11.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_12.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_13.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_14.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_15.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_16.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_17.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_18.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_19.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_20.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_21.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_22.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_23.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_24.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_25.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_26.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_27.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_28.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_29.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_30.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_31.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_32.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_33.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_34.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_35.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_36.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_37.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_38.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_39.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_40.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_41.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_42.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_43.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_44.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_45.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_46.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_47.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_48.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_49.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_50.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_51.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_52.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_53.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_54.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_55.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_56.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_57.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_58.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_59.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_60.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_61.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_62.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_63.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_64.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_65.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_66.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_67.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_68.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_69.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_70.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_71.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_72.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_73.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_74.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_75.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_76.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_77.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_78.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_79.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_80.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_81.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_82.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_83.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_84.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_85.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_86.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_87.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_88.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_89.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_90.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_91.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_92.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_93.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_94.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_95.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_96.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_97.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_98.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_99.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_100.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_101.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_102.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_103.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_104.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_105.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_106.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_107.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_108.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_109.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_110.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_111.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_112.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_113.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_114.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_115.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_116.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_117.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_118.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_119.jpg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_120.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_121.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_122.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_123.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_124.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_125.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_126.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_127.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_128.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_129.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_130.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_131.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_132.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_133.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_134.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_135.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_136.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_137.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_138.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_139.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_140.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_141.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_142.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_143.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_144.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_145.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_146.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_147.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_148.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_149.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_150.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_151.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_152.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_153.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_154.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_155.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_156.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_157.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_158.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_159.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_160.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_161.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_162.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_163.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_164.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_165.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_166.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_167.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_168.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_169.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_170.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_171.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_172.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_173.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_174.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_175.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_176.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_177.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_178.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_179.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_180.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_181.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_182.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_183.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_184.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_185.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_186.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_187.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_188.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_189.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_190.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_191.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_192.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_193.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_194.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_195.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_196.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_197.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_198.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_199.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_200.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_201.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_202.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_203.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_204.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_205.jpeg", semester: 10, text: "10th Semester" },
-                { src: "images/10th Semester/S10_206.jpeg", semester: 10, text: "10th Semester" },
-                
-        ]
-        },
-
-        {
-            name: "Semester 11", 
-            photos:[
-            { src: "images/11th Semester/S11_1.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_2.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_3.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_4.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_5.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_6.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_7.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_8.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_9.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_10.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_11.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_12.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_13.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_14.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_15.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_16.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_17.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_18.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_19.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_20.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_21.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_22.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_23.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_24.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_25.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_26.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_27.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_28.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_29.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_30.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_31.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_32.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_33.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_34.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_35.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_36.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_37.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_38.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_39.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_40.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_41.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_42.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_43.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_44.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_45.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_46.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_47.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_48.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_49.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_50.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_51.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_52.jpg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_53.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_54.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_55.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_56.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_57.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_58.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_59.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_60.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_61.jpeg", semester: 11, text: "Our First Presentation" },
-            { src: "images/11th Semester/S11_62.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_63.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_64.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_65.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_66.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_67.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_68.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_69.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_70.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_71.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_72.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_73.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_74.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_75.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_76.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_77.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_78.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_79.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_80.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_81.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_82.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_83.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_84.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_85.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_86.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_87.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_88.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_89.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_90.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_91.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_92.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_93.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_94.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_95.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_96.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_97.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_98.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_99.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_100.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_101.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_102.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_103.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_104.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_105.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_106.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_107.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_108.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_109.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_110.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_111.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_112.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_113.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_114.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_115.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_116.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_117.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_118.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_119.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_120.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_121.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_122.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_123.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_124.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_125.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_126.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_127.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_128.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_129.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_130.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_131.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_132.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_133.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_134.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_135.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_136.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_137.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_138.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_139.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_140.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_141.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_142.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_143.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_144.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_145.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_146.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_147.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_148.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_149.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_150.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_151.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_152.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_153.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_154.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_155.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_156.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_157.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_158.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_159.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_160.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_161.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_162.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_163.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_164.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_165.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_166.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_167.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_168.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_169.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_170.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_171.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_172.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_173.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_174.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_175.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_176.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_177.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_178.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_179.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_180.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_181.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_182.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_183.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_184.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_185.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_186.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_187.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_188.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_189.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_190.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_191.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_192.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_193.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_194.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_195.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_196.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_197.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_198.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_199.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_200.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_201.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_202.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_203.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_204.jpg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_205.jpeg", semester: 11, text: "11th Semester" },
-            { src: "images/11th Semester/S11_206.jpeg", semester: 11, text: "11th Semester" },
-            
-        ]
-    },
-        {
-            name: "Semester 12", 
-            photos: [
-
-        ]
-        },
-        {
-            name: "Convocation", 
-            photos: [
-
-        ]
-        },
-        {
-            name: "Gibli Art", 
-            photos: [
-            { src: "images/Gibli Art/1.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/2.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/3.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/4.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/5.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/6.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/7.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/8.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/9.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/10.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/11.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/12.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/13.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/14.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/15.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/16.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/17.png", semester: 11, text: "Our First Presentation" },
-            { src: "images/Gibli Art/18.png", semester: 11, text: "Our First Presentation" },
-        ]
-        },
-         {
-            name: "Others", 
-            photos: [
-
-        ]
-        },
-    
-    ];
-
-    const photoGallery = document.getElementById("photo-gallery");
-
-    // Generate Sections Dynamically
-    sections.forEach((section, index) => {
-        let sectionDiv = document.createElement("div");
-        sectionDiv.classList.add("semester-section");
-        sectionDiv.id = `section-${index + 1}`;
-
-        // Create the title of the section
-        let title = document.createElement("h2");
-        title.classList.add("semester-title");
-        title.innerText = section.name;
-        sectionDiv.appendChild(title);
-
-        // Create the photo grid
-        let grid = document.createElement("div");
-        grid.classList.add("photo-grid");
-
-        section.photos.forEach(photo => {
-            let img = document.createElement("img");
-            img.src = photo.src;
-            img.onclick = () => openLightbox(photo.src, photo.text);
-            grid.appendChild(img);
-        });
-
-        sectionDiv.appendChild(grid);
-        photoGallery.appendChild(sectionDiv);
-        buildPhotoList();
-    });
 });
