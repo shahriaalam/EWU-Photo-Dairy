@@ -78,10 +78,10 @@ body {
   position: relative;
   z-index: 2;
   background: rgba(205, 180, 219, 0.22);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 200, 221, 0.35);
-  padding: 48px 40px;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border: 1px solid rgba(239, 132, 173, 0.35);
+  padding: 20px 20px;
   border-radius: 20px;
   text-align: center;
   max-width: 400px;
@@ -90,10 +90,9 @@ body {
 }
 
 #login-container::before {
-  content: "🌸";
   display: block;
   font-size: 2.5rem;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 #login-container h2 {
@@ -350,7 +349,7 @@ body {
 .photo-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(140,80,160,0.28) 0%, transparent 55%);
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.28) 0%, transparent 50%);
   opacity: 0;
   transition: opacity var(--transition);
 }
@@ -360,7 +359,7 @@ body {
 #lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(60, 30, 75, 0.93);
+  background: rgba(60, 30, 75, 0.33);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -421,23 +420,23 @@ body {
   max-height: 82vh;
   border-radius: 8px;
   object-fit: contain;
-  box-shadow: 0 24px 80px rgba(100,50,120,0.5);
+  box-shadow: 0 24px 80px rgba(219, 139, 248, 0.7);
   opacity: 0;
   transition: opacity 0.35s ease;
 }
 #lightbox-img.lb-ready { opacity: 1; }
 
 #lightbox-text {
-  color: rgba(255,200,221,0.75);
-  font-size: 0.88rem;
+  color: rgba(250, 215, 229);
+  font-size: 0.99rem;
   letter-spacing: 0.06em;
   font-family: var(--font-display);
   font-style: italic;
 }
 
 #lb-counter {
-  color: rgba(205,180,219,0.55);
-  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 1);
+  font-size: 0.85rem;
   letter-spacing: 0.1em;
 }
 
@@ -467,7 +466,7 @@ body {
 #footer {
   text-align: center;
   padding: 28px 20px;
-  background: linear-gradient(135deg, #e8c8f0, #ffc8dd 50%, #bde0fe);
+  background: linear-gradient(135deg, #ffffff, #ffc8dd 50%, #ffffff);
   color: var(--text-md);
   font-size: 0.82rem;
   letter-spacing: 0.06em;

@@ -105,12 +105,12 @@ document.addEventListener("DOMContentLoaded", function () {
       section.photos.forEach((photo, photoIndex) => {
         const wrapper = document.createElement("div");
         wrapper.classList.add("photo-item");
+        wrapper.onclick = () => openLightbox(photo.src, photo.text, allPhotos.findIndex(p => p.src === photo.src));
 
         const img = document.createElement("img");
         img.dataset.src = photo.src;   // lazy load
         img.alt = photo.text || section.name;
         img.classList.add("lazy");
-        img.onclick = () => openLightbox(photo.src, photo.text, allPhotos.findIndex(p => p.src === photo.src));
 
         const overlay = document.createElement("div");
         overlay.classList.add("photo-overlay");
