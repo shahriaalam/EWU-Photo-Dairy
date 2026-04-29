@@ -4283,11 +4283,59 @@ const SECTIONS = [
     "name": "Semester 12",
     "photos": [
       {
+        "src": "images/12th Semester/IMG_20250905_002352_030.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250905_002417_835.jpg",
+        "text": "Semester 12"
+      },
+      {
         "src": "images/12th Semester/IMG_20250905_002539_077.jpg",
         "text": "Semester 12"
       },
       {
+        "src": "images/12th Semester/IMG_20250905_013028_040.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_223251_651.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_223332_060.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_223349_211.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_223353_938.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_223358_952.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_223405_981.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_223431_494.jpg",
+        "text": "Semester 12"
+      },
+      {
         "src": "images/12th Semester/IMG_20250911_224551.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_224621.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250911_224632.jpg",
         "text": "Semester 12"
       }
     ]
