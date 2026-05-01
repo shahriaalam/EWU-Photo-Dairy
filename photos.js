@@ -4546,6 +4546,10 @@ const SECTIONS = [
       {
         "src": "images/Convocation/IMG_20260203_123346.jpg",
         "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/WhatsApp Image 2026-05-01 at 20.58.14.jpeg",
+        "text": "Convocation"
       }
     ]
   },
