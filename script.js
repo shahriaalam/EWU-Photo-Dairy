@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const sectionDiv = document.createElement("div");
       sectionDiv.classList.add("semester-section");
       sectionDiv.id = `section-${index + 1}`;
-
+      if (index === 0) sectionDiv.classList.add("section-family");
       // Header
       const header = document.createElement("div");
       header.classList.add("section-header");

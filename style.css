@@ -315,6 +315,10 @@ body {
 }
 
 /* ── Photo Grid ──────────────────────────────────────────────────────────────── */
+.section-family .photo-grid {
+  columns: 4 180px;
+}
+
 .photo-grid {
   columns: 5 180px;
   column-gap: 10px;
