@@ -5,35 +5,35 @@ const SECTIONS = [
     "photos": [
       {
         "src": "images/1st Semester/1.jpg",
-        "text": "Sidratul Moontaha (2021-3-60-048)"
+        "text": "Our Family"
       },
       {
         "src": "images/1st Semester/2.jpg",
-        "text": "B. M. Shahria Alam (2021-3-60-016)"
+        "text": "Our Family"
       },
       {
         "src": "images/1st Semester/3.jpg",
-        "text": "Tasmiah Rahman Orpa (2021-3-60-021)"
+        "text": "Our Family"
       },
       {
         "src": "images/1st Semester/4.jpg",
-        "text": "Mohammad Tahmid Noor (2021-3-60-026)"
+        "text": "Our Family"
       },
       {
         "src": "images/1st Semester/5.jpg",
-        "text": "Umma Habiba Ahmed (2021-3-60-047)"
+        "text": "Our Family"
       },
       {
         "src": "images/1st Semester/6.jpg",
-        "text": "Mahjabin Tasnim (2021-3-60-271)"
+        "text": "Our Family"
       },
       {
         "src": "images/1st Semester/7.jpg",
-        "text": "Ishrat Jahan Momo (2021-3-60-049)"
+        "text": "Our Family"
       },
       {
         "src": "images/1st Semester/8.jpeg",
-        "text": "Shaila Afroz Anika (2021-3-60-045)"
+        "text": "Our Family"
       }
     ]
   },
@@ -4342,7 +4342,180 @@ const SECTIONS = [
   },
   {
     "name": "Convocation",
-    "photos": []
+    "photos": [
+      {
+        "src": "images/Convocation/IMG-20260129-WA0193.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0203.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0205.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0209.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0223.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0227.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0233.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0239.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0241.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0257.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0289.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260129-WA0516.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0013.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0014.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0046.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0047.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0049.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0114.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0143.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0159.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0160.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0164.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0174.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0178.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0191.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0205.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0214.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0225.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0227.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0384.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0461.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0466.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0484.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0489.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0490.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0548.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0560.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0562.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0566.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0589.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0593.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0645.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG-20260202-WA0649.jpg",
+        "text": "Convocation"
+      }
+    ]
   },
   {
     "name": "Gibli Art",
