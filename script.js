@@ -220,12 +220,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (Math.abs(diff) > 50) navigateLightbox(diff > 0 ? 1 : -1);
   });
 
-  // ── Visitor Counter ──────────────────────────────────────────────────────────
-  fetch("https://api.countapi.xyz/hit/shahriaalam-ewu-photo-dairy/visits")
+ // ── Visitor Counter ──────────────────────────────────────────────────────────
+  fetch("https://hits.sh/shahriaalam.github.io/EWU-Photo-Dairy.json")
   .then(res => res.json())
   .then(data => {
     const el = document.getElementById("visit-count");
-    if (el) el.textContent = data.value.toLocaleString();
+    if (el) el.textContent = Number(data.total).toLocaleString();
   })
   .catch(() => {
     const el = document.getElementById("visit-count");
