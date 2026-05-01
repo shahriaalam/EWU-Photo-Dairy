@@ -4514,6 +4514,38 @@ const SECTIONS = [
       {
         "src": "images/Convocation/IMG-20260202-WA0649.jpg",
         "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260131_220247_592.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260131_220258_081.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260131_220315_216.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260202_221859.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260203_091642_527.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260203_091702_309.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260203_123250.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260203_123346.jpg",
+        "text": "Convocation"
       }
     ]
   },
