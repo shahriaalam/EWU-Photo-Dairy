@@ -4283,6 +4283,174 @@ const SECTIONS = [
     "name": "Semester 12",
     "photos": [
       {
+        "src": "images/12th Semester/IMG20250718115923 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG20250718181953 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG20250721150608 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG20250721164009 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG20250820141110 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG20250820190730 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG20251219082211 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG-20250902-WA0018 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG-20250902-WA0020 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250614_123646_627.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250614_123850_222.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250616_120419.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250616_120645.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250624_232953_297.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250624_233018_932.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250624_233024_323.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250626_214448_988.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250626_214532_453.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250626_221516.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250626_221614.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250629_212956_687.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250629_213015_536.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250629_213030_623.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250629_213040_957.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250629_213057_796.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_202847 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_202937 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_203100_981.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_203123_532.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_203148_392.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_203242.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_203522_735.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250630_214835_902.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250706_231917_413.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250706_231936_616.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250707_211224_373.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250707_211315_395.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250707_211337_371.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250707_211656.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250717_160449_285.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250820_222649 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20250820_222736 Large.jpeg",
+        "text": "Semester 12"
+      },
+      {
         "src": "images/12th Semester/IMG_20250905_002352_030.jpg",
         "text": "Semester 12"
       },
@@ -4337,12 +4505,60 @@ const SECTIONS = [
       {
         "src": "images/12th Semester/IMG_20250911_224632.jpg",
         "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20251219_145735_352.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20251219_145750_472.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/IMG_20251219_145844_413.jpg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/received_1443326790231062.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/received_1500135114224930.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/received_1519081086190934.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/received_1586950892282479.jpeg",
+        "text": "Semester 12"
+      },
+      {
+        "src": "images/12th Semester/received_2056195394918661.jpeg",
+        "text": "Semester 12"
       }
     ]
   },
   {
     "name": "Convocation",
     "photos": [
+      {
+        "src": "images/Convocation/1000144945 (1) Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/FB_IMG_1770034145960.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG20260201135714 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG20260201142338 Large.jpeg",
+        "text": "Convocation"
+      },
       {
         "src": "images/Convocation/IMG-20260129-WA0193.jpg",
         "text": "Convocation"
@@ -4468,6 +4684,10 @@ const SECTIONS = [
         "text": "Convocation"
       },
       {
+        "src": "images/Convocation/IMG-20260202-WA0463.jpg",
+        "text": "Convocation"
+      },
+      {
         "src": "images/Convocation/IMG-20260202-WA0466.jpg",
         "text": "Convocation"
       },
@@ -4516,6 +4736,78 @@ const SECTIONS = [
         "text": "Convocation"
       },
       {
+        "src": "images/Convocation/IMG_1048 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_1731 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_1734 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_1735 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2014 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2033 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2033~2 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2078 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2222 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2226 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2232 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2854 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2855 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2856 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2859 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2862 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_2863 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260124_152324 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
         "src": "images/Convocation/IMG_20260131_220247_592.jpg",
         "text": "Convocation"
       },
@@ -4525,6 +4817,22 @@ const SECTIONS = [
       },
       {
         "src": "images/Convocation/IMG_20260131_220315_216.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260201_202757 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260201_202828 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260201_225603 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260201_231403 Large.jpeg",
         "text": "Convocation"
       },
       {
@@ -4540,11 +4848,43 @@ const SECTIONS = [
         "text": "Convocation"
       },
       {
+        "src": "images/Convocation/IMG_20260203_123146 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
         "src": "images/Convocation/IMG_20260203_123250.jpg",
         "text": "Convocation"
       },
       {
         "src": "images/Convocation/IMG_20260203_123346.jpg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260203_123433 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/IMG_20260203_162326 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/Messenger_creation_7D43CA84-39C6-4DE7-9BBA-12A49C139D28 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/Messenger_creation_0101CCD4-D446-4985-A266-B6D9C721B183 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/received_4189663988013831.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/Snapchat-1436778349 Large.jpeg",
+        "text": "Convocation"
+      },
+      {
+        "src": "images/Convocation/Snapchat-1613819313 Large.jpeg",
         "text": "Convocation"
       },
       {
@@ -4632,6 +4972,131 @@ const SECTIONS = [
   },
   {
     "name": "Others",
-    "photos": []
+    "photos": [
+      {
+        "src": "images/Others/IMG20250926142425 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG20260326150656 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG20260402172818 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260308-WA0022.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260308-WA0023.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260326-WA0108 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260326-WA0112 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260326-WA0118(1) Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260326-WA0149.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260330-WA0014 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260330-WA0020 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG-20260402-WA0009.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_6724 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_6749 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_9946 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20250914_022138 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20250927_161012 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20251207_201455 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20251207_212940 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20251207_212959 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260216_221251_596.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260309_234719 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260326_191350 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260405_225019_746.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260426_224937 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260426_225009 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260426_225030 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260426_230252 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/Snapchat-507860946 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/Snapchat-1768316407 Large.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/Snapchat-1790647852 Large.jpeg",
+        "text": "Others"
+      }
+    ]
   }
 ];
