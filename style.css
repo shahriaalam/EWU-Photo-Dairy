@@ -475,6 +475,14 @@ body {
 }
 #footer span { color: var(--text-dk); font-weight: 500; }
 
+#visitor-counter {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
 /* ── Back to Top ─────────────────────────────────────────────────────────────── */
 #back-to-top {
   position: fixed;

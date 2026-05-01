@@ -220,4 +220,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (Math.abs(diff) > 50) navigateLightbox(diff > 0 ? 1 : -1);
   });
 
+  // ── Visitor Counter ──────────────────────────────────────────────────────────
+  fetch("https://api.countapi.xyz/hit/shahriaalam-ewu-photo-dairy/visits")
+  .then(res => res.json())
+  .then(data => {
+    const el = document.getElementById("visit-count");
+    if (el) el.textContent = data.value.toLocaleString();
+  })
+  .catch(() => {
+    const el = document.getElementById("visit-count");
+    if (el) el.textContent = "N/A";
+  });
+
 });
