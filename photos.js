@@ -4967,6 +4967,10 @@ const SECTIONS = [
       {
         "src": "images/Gibli Art/18.png",
         "text": "Gibli Art"
+      },
+      {
+        "src": "images/Gibli Art/19.png",
+        "text": "Gibli Art"
       }
     ]
   },
