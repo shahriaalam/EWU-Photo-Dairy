@@ -5090,6 +5090,102 @@ const SECTIONS = [
         "text": "Others"
       },
       {
+        "src": "images/Others/IMG_20260815_230600_630.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230607_157.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230628_594.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230647_991.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230653_939.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230735_102.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230740_665.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230745_814.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260815_230753_173.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/IMG_20260816_004546.jpg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.16.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.21.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.24.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.34.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.38.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.47.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.50.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.42.53.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.43.00.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.43.51.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.44.07.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.44.14.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.44.41.jpeg",
+        "text": "Others"
+      },
+      {
+        "src": "images/Others/photo_2026-08-19 22.44.50.jpeg",
+        "text": "Others"
+      },
+      {
         "src": "images/Others/Snapchat-507860946 Large.jpeg",
         "text": "Others"
       },
