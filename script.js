@@ -220,16 +220,63 @@ document.addEventListener("DOMContentLoaded", function () {
     if (Math.abs(diff) > 50) navigateLightbox(diff > 0 ? 1 : -1);
   });
 
- // ── Visitor Counter ──────────────────────────────────────────────────────────
-  fetch("https://hits.sh/shahriaalam.github.io/EWU-Photo-Dairy.json")
-  .then(res => res.json())
-  .then(data => {
-    const el = document.getElementById("visit-count");
-    if (el) el.textContent = Number(data.total).toLocaleString();
-  })
-  .catch(() => {
-    const el = document.getElementById("visit-count");
-    if (el) el.textContent = "N/A";
-  });
+  // ── Visitor Counter ──────────────────────────────────────────────────────────
+  const visitEl = document.getElementById("visit-count");
+  if (visitEl) {
+    const COUNTER_KEY = "shahriaalam-ewu-photo-dairy";
+    const API_BASE = "https://countapi.mileshilliard.com/api/v1";
+
+    const updateDisplay = (count) => {
+      if (visitEl && count != null && !isNaN(count)) {
+        visitEl.textContent = Number(count).toLocaleString();
+      }
+    };
+
+    let hasVisitedThisSession = false;
+    try {
+      hasVisitedThisSession = Boolean(sessionStorage.getItem("ewu_visited"));
+    } catch (_) {}
+
+    // Only increment once per browser session; subsequent views retrieve current count
+    const endpoint = hasVisitedThisSession
+      ? `${API_BASE}/get/${COUNTER_KEY}`
+      : `${API_BASE}/hit/${COUNTER_KEY}`;
+
+    fetch(endpoint)
+      .then(res => {
+        if (!res.ok) {
+          // If GET failed because key wasn't initialized, try hit
+          if (endpoint.includes("/get/")) {
+            return fetch(`${API_BASE}/hit/${COUNTER_KEY}`).then(r => r.json());
+          }
+          throw new Error("HTTP error " + res.status);
+        }
+        return res.json();
+      })
+      .then(data => {
+        const count = data?.value;
+        if (typeof count === "number") {
+          updateDisplay(count);
+          try {
+            sessionStorage.setItem("ewu_visited", "true");
+            localStorage.setItem("ewu_cached_visitors", count);
+          } catch (_) {}
+        } else {
+          throw new Error("Invalid count response");
+        }
+      })
+      .catch(() => {
+        // Fallback to locally cached count if network/API is unavailable
+        try {
+          const cached = localStorage.getItem("ewu_cached_visitors");
+          if (cached) {
+            updateDisplay(cached);
+            return;
+          }
+        } catch (_) {}
+        // Graceful fallback display
+        updateDisplay(1);
+      });
+  }
 
 });
