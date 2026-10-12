@@ -102,15 +102,32 @@ document.addEventListener("DOMContentLoaded", function () {
       const grid = document.createElement("div");
       grid.classList.add("photo-grid");
 
-      section.photos.forEach((photo, photoIndex) => {
+      section.photos.forEach((photo) => {
         const wrapper = document.createElement("div");
         wrapper.classList.add("photo-item");
         wrapper.onclick = () => openLightbox(photo.src, photo.text, allPhotos.findIndex(p => p.src === photo.src));
 
         const img = document.createElement("img");
-        img.dataset.src = photo.src;   // lazy load
+        const thumbSrc = photo.thumb || photo.src;
+        img.dataset.src = thumbSrc;
+        img.dataset.full = photo.src;
         img.alt = photo.text || section.name;
+        img.loading = "lazy";
+        img.decoding = "async";
         img.classList.add("lazy");
+
+        // Error fallback: if thumbnail fails or is missing, fall back to original image
+        img.onerror = function () {
+          if (this.src !== photo.src) {
+            this.src = photo.src;
+          }
+        };
+
+        img.onload = function () {
+          img.classList.remove("lazy");
+          img.classList.add("loaded");
+          wrapper.classList.add("has-loaded");
+        };
 
         const overlay = document.createElement("div");
         overlay.classList.add("photo-overlay");
@@ -137,16 +154,18 @@ document.addEventListener("DOMContentLoaded", function () {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const img = entry.target;
-            img.src = img.dataset.src;
-            img.classList.remove("lazy");
-            img.classList.add("loaded");
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+            }
             observer.unobserve(img);
           }
         });
-      }, { rootMargin: "200px 0px" });
+      }, { rootMargin: "300px 0px" });
       lazyImgs.forEach(img => observer.observe(img));
     } else {
-      lazyImgs.forEach(img => { img.src = img.dataset.src; img.classList.add("loaded"); });
+      lazyImgs.forEach(img => {
+        if (img.dataset.src) img.src = img.dataset.src;
+      });
     }
   }
 
@@ -160,6 +179,19 @@ document.addEventListener("DOMContentLoaded", function () {
         span.classList.add("nav-badge");
         span.textContent = section.photos.length;
         btn.appendChild(span);
+      }
+    });
+  }
+
+  // ── Lightbox Preloading ──────────────────────────────────────────────────────
+  function preloadAdjacentLightbox(index) {
+    if (!allPhotos || allPhotos.length <= 1) return;
+    const nextIdx = (index + 1) % allPhotos.length;
+    const prevIdx = (index - 1 + allPhotos.length) % allPhotos.length;
+    [nextIdx, prevIdx].forEach(i => {
+      if (allPhotos[i] && allPhotos[i].src) {
+        const pre = new Image();
+        pre.src = allPhotos[i].src;
       }
     });
   }
@@ -178,6 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("lb-counter").innerText = `${currentPhotoIndex + 1} / ${allPhotos.length}`;
     lb.classList.remove("hidden");
     document.body.style.overflow = "hidden";
+    preloadAdjacentLightbox(currentPhotoIndex);
   };
 
   window.closeLightbox = function () {
@@ -196,6 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
     lbImg.onload = () => lbImg.classList.add("lb-ready");
     document.getElementById("lightbox-text").innerText = photo.text || "";
     document.getElementById("lb-counter").innerText = `${currentPhotoIndex + 1} / ${allPhotos.length}`;
+    preloadAdjacentLightbox(currentPhotoIndex);
   };
 
   // Close on backdrop click

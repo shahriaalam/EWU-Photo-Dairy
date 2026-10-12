@@ -277,6 +277,8 @@ body {
   overflow: hidden;
   box-shadow: 0 2px 32px var(--shadow);
   border: 1px solid rgba(205,180,219,0.25);
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 800px;
 }
 
 .section-header {
@@ -333,16 +335,39 @@ body {
   border-radius: 8px;
   cursor: pointer;
   background: #f0e6f8;
+  min-height: 140px;
+}
+
+.photo-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(205,180,219,0.1) 0%, rgba(255,200,221,0.25) 50%, rgba(205,180,219,0.1) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.photo-item.has-loaded::before {
+  opacity: 0;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .photo-item img {
   width: 100%;
+  height: auto;
   display: block;
-  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), filter 0.3s ease;
+  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), filter 0.3s ease, opacity 0.35s ease;
   filter: brightness(0.98) saturate(0.95);
 }
 
-.photo-item img.lazy   { opacity: 0; transition: opacity 0.4s ease; }
+.photo-item img.lazy   { opacity: 0; }
 .photo-item img.loaded { opacity: 1; }
 
 .photo-item:hover img {
